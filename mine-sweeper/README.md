@@ -1,75 +1,135 @@
-# React + TypeScript + Vite
+# Minesweeper Generator (React + TypeScript)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple Minesweeper grid generator built with **TypeScript** and rendered using **React**. This project focuses on the **core game logic**: random mine placement and clue calculation.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Random mine placement (no duplicates)
+- Automatic clue calculation (1–8 based on surrounding mines)
+- 2D grid generation
+- React-based UI rendering
+- Regenerate grid functionality (optional)
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+---
 
-Note: This will impact Vite dev & build performances.
+## How It Works
 
-## Expanding the ESLint configuration
+### 1. Mine Placement
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+A 1D array is created with `-1` for mines and `0` for empty cells. The array is shuffled using the **Fisher-Yates algorithm**, then converted into a 2D grid.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 2. Clue Calculation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+For each non-mine cell, all 8 surrounding directions are checked and the count of adjacent mines is assigned as the cell's value (`0–8`).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Project Structure
+
+```
+src/
+├── component/
+│   └── MineSweeperTable.tsx   # UI table component
+├── utils/
+│   ├── mineGeneration.ts      # Generates grid with mines
+│   └── calculateClues.ts      # Calculates numbers
+├── types/
+│   └── mine.ts                # Type definitions
+├── App.tsx
+└── App.css
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Data Representation
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```ts
+type Grid = number[][];
 ```
+
+| Value | Meaning |
+|-------|---------|
+| `-1`  | 💣 Mine |
+| `0`   | Empty   |
+| `1–8` | Adjacent mine count |
+
+### Example
+
+```
+[
+  [0, 1, -1],
+  [0, 2,  2],
+  [0, 1, -1]
+]
+```
+
+Rendered as:
+
+```
+.  1  💣
+.  2  2
+.  1  💣
+```
+
+---
+
+## Usage
+
+```ts
+// Generate grid
+const mineGrid = mineGeneration(5, 5, 5);
+const finalGrid = calculateClues(mineGrid);
+
+// Render in React
+<MineSweeperTable grid={finalGrid} />
+
+// Regenerate
+const generateNewGrid = () => {
+  const mineGrid = mineGeneration(5, 5, 5);
+  const finalGrid = calculateClues(mineGrid);
+  setGrid(finalGrid);
+};
+```
+
+---
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
+## Key Concepts
+
+- 2D array manipulation
+- Randomization (Fisher-Yates shuffle)
+- Grid traversal (8-directional)
+- Separation of concerns
+- React state management
+
+---
+
+## Future Improvements
+
+- Interactive gameplay (click to reveal)
+- Flagging mines
+- Game over / win logic
+- Flood fill for empty cells
+- Better UI (Tailwind / animations)
+
+---
+
+## Notes
+
+- The grid is generated once on load
+- Numbers are calculated from mine positions, not random
+- Logic is separated for scalability and testability
+
+---
+
+*Built as a learning project to understand algorithms, TypeScript, and React fundamentals.*
