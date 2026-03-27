@@ -8,7 +8,7 @@ import "./App.css";
 function App() {
   const [grid, setGrid] = useState<Grid>([]);
 
-  useEffect(() => {
+  const generateGrid = () => {
     const rows = 5;
     const cols = 5;
     const mines = 5;
@@ -17,12 +17,20 @@ function App() {
     const finalGrid = calculateClues(mineGrid);
 
     setGrid(finalGrid);
+  };
+
+  useEffect(() => {
+    generateGrid();
   }, []);
 
   return (
     <div>
       <h1>Minesweeper</h1>
       <MineSweeperTable grid={grid} />
+      
+      <button onClick={generateGrid}>
+        New Game
+      </button>
     </div>
   );
 }
